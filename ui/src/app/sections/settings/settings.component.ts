@@ -96,24 +96,6 @@ export class SettingsComponent implements OnInit {
     action: this.update.bind(this)
   }
 
-  otaUpdatesOption: CheckboxOption = {
-    type: 'checkbox',
-    value: false,
-    label: 'OTA Updates',
-    tooltip: `
-Because eqMac's User Interface is built with Web Technologies 
-the developer can periodically push Over the Air (OTA) updates,
-make minor bug fixes and UI improvements,
-all without needing the user to do a full app update.
-`,
-    tooltipAsComponent: false,
-    toggled: doOTAUpdates => {
-      this.settingsService.setDoOTAUpdates({
-        doOTAUpdates
-      })
-    }
-  }
-
   statusItemIconTypeOption: SelectOption = {
     type: 'select',
     label: 'Status Icon Type',
@@ -252,9 +234,6 @@ all without needing the user to do a full app update.
 
     [ { type: 'label', label: 'Updates' } ],
     [
-      this.otaUpdatesOption
-    ],
-    [
       this.updateOption
     ],
 
@@ -287,7 +266,6 @@ all without needing the user to do a full app update.
       launchOnStartup,
       iconMode,
       UISettings,
-      doOTAUpdates,
       alwaytOnTop,
       statusItemIconType,
       uiScale
@@ -295,7 +273,6 @@ all without needing the user to do a full app update.
       this.settingsService.getLaunchOnStartup(),
       this.settingsService.getIconMode(),
       this.ui.getSettings(),
-      this.settingsService.getDoOTAUpdates(),
       this.ui.getAlwaysOnTop(),
       this.ui.getStatusItemIconType(),
       this.ui.getScale()
@@ -304,7 +281,6 @@ all without needing the user to do a full app update.
     this.launchOnStartupOption.value = launchOnStartup
     this.replaceKnobsWithSlidersOption.value = UISettings.replaceKnobsWithSliders
     this.knobControlStyleOption.selectedId = UISettings.knobControlStyle
-    this.otaUpdatesOption.value = doOTAUpdates
     this.alwaysOnTopOption.value = alwaytOnTop
     this.statusItemIconTypeOption.selectedId = statusItemIconType
     this.uiScaleSlider.value = uiScale

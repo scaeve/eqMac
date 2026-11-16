@@ -10,3 +10,6 @@ dist
 **/yarn.lock
 
 native/app/Sandbox.playground/Resources/track.mp3
+
+# Built UI, copied in by `npm run build` in ui/
+native/app/Embedded/

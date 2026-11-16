@@ -554,6 +554,7 @@
 				E00C596723BBBF7500C7B8B6 /* Headers */,
 				E086AFF81FCCB8E700CF9F0D /* Sources */,
 				E086AFFA1FCCB8E700CF9F0D /* Resources */,
+				5CA3E0F10000000000000001 /* Run Script - Embed UI bundle */,
 				E086AFF91FCCB8E700CF9F0D /* Frameworks */,
 				E0F4FD9A22888AC300BEB0A6 /* Run Script - LaunchAtLogin copy-helper */,
 				896A6D438DAEE15F87C748E4 /* [CP] Embed Pods Frameworks */,
@@ -638,6 +639,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5CA3E0F10000000000000001 /* Run Script - Embed UI bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Embed UI bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SRC=\"${SRCROOT}/Embedded/ui\"\nif [ ! -f \"$SRC/index.html\" ]; then\n  echo \"error: $SRC/index.html not found. Build the UI first: cd ui && npm run build\"\n  exit 1\nfi\nDEST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ui\"\nmkdir -p \"$DEST\"\n# --delete drops stale hashed bundles from previous UI builds\nrsync -a --delete \"$SRC/\" \"$DEST/\"\n";
+		};
 		896A6D438DAEE15F87C748E4 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

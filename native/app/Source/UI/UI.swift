@@ -12,8 +12,6 @@ import Cocoa
 import EmitterKit
 import SwiftyUserDefaults
 import WebKit
-import Zip
-import SwiftHTTP
 import Shared
 
 enum UIMode: String, Codable {
@@ -101,39 +99,17 @@ class UI: StoreSubscriber {
     return state.resizable
   }
   
-  static var domain = Constants.UI_ENDPOINT_URL.host!
-
-  static func unarchiveZip () {
-    // Unpack Archive
-    let fs = FileManager.default
-    
-    if fs.fileExists(atPath: remoteZipPath.path) {
-      try! Zip.unzipFile(remoteZipPath, destination: localPath, overwrite: true, password: nil) // Unzip
-    } else {
-      if !fs.fileExists(atPath: localZipPath.path) {
-        Console.log("\(localZipPath.path) doesnt exist")
-        let bundleUIZipPath = Bundle.main.url(forResource: "ui", withExtension: "zip", subdirectory: "Embedded")!
-        try! fs.copyItem(at: bundleUIZipPath, to: localZipPath)
-      }
-      try! Zip.unzipFile(localZipPath, destination: localPath, overwrite: true, password: nil) // Unzip
+  /// The web UI's entry point, bundled in the app's Resources/ui by the build.
+  ///
+  /// Upstream shipped the UI as a zip, extracted it into Application Support and cached
+  /// it per app version (so a rebuilt app could keep showing a stale UI), mainly to support
+  /// downloading UI updates from the original developer's server. This fork loads it
+  /// straight from the app bundle.
+  static var bundledUIIndexURL: URL {
+    guard let url = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "ui") else {
+      fatalError("Resources/ui/index.html is missing from the app bundle. Build the UI first: cd ui && npm run build")
     }
-  }
-  
-  static var localZipPath: URL {
-    return Application.supportPath.appendingPathComponent(
-      "ui-\(Application.version) (Local).zip",
-      isDirectory: false
-    )
-  }
-  
-  static var remoteZipPath: URL {
-    return Application.supportPath.appendingPathComponent(
-      "ui-\(Application.version) (Remote).zip",
-      isDirectory: false
-    )
-  }
-  static var localPath: URL {
-    return Application.supportPath.appendingPathComponent("ui")
+    return url
   }
   
   static let statusItem = StatusItem()
@@ -391,100 +367,40 @@ class UI: StoreSubscriber {
   
   private static func load () {
     hasLoaded = false
-    
+
     func startUILoad (_ url: URL) {
       DispatchQueue.main.async {
         viewController.load(url)
       }
     }
 
-    func loadRemote () {
-      Console.log("Loading Remote UI")
-      startUILoad(Constants.UI_ENDPOINT_URL)
-      self.getRemoteVersion { remoteVersion in
-        if remoteVersion != nil {
-          let fs = FileManager.default
-          if fs.fileExists(atPath: remoteZipPath.path) {
-            unarchiveZip()
-            let currentVersion = try? String(contentsOf: localPath.appendingPathComponent("version.txt"))
-            if (currentVersion?.trim() != remoteVersion?.trim()) {
-              self.cacheRemote()
-            }
-          } else {
-            self.cacheRemote()
-          }
-        }
-      }
+    func loadBundled () {
+      Console.log("Loading bundled UI")
+      startUILoad(bundledUIIndexURL)
     }
 
-    func loadLocal () {
-      Console.log("Loading Local UI")
-      unarchiveZip()
-      let url = URL(string: "\(localPath)/index.html")!
-      startUILoad(url)
+    guard let devServerURL = Constants.UI_DEV_SERVER_URL else {
+      return loadBundled()
     }
 
-    if (Application.store.state.settings.doOTAUpdates) {
-      remoteIsReachable() { reachable in
-        if reachable {
-          loadRemote()
-        } else {
-          loadLocal()
-        }
-      }
-    } else {
-      loadLocal()
-    }
-
-  }
-  
-  private static func getRemoteVersion (_ completion: @escaping (String?) -> Void) {
-    HTTP.GET("\(Constants.UI_ENDPOINT_URL)/version.txt") { resp in
-      completion(resp.error != nil ? nil : resp.text?.trim())
-    }
-  }
-  
-  private static func remoteIsReachable (_ completion: @escaping (Bool) -> Void) {
-    var returned = false
-    Networking.checkConnected { reachable in
-      if (!reachable) {
-        returned = true
-        return completion(false)
-      }
-
-      HTTP.GET(Constants.UI_ENDPOINT_URL.absoluteString) { response in
-        returned = true
-        completion(response.error == nil)
-      }
-    }
-    
-    Async.delay(1000) {
-      if (!returned) {
-        returned = true
-        completion(false)
+    devServerIsReachable(devServerURL) { reachable in
+      if reachable {
+        Console.log("Loading UI from dev server at \(devServerURL)")
+        startUILoad(devServerURL)
+      } else {
+        loadBundled()
       }
     }
   }
-  
-  private static func cacheRemote () {
-    // Only download ui.zip when UI endpoint is remote
-    if Constants.UI_ENDPOINT_URL.absoluteString.contains(Constants.DOMAIN) {
-      let remoteZipUrl = "\(Constants.UI_ENDPOINT_URL)/ui.zip"
-      Console.log("Caching Remote UI from \(remoteZipUrl)")
-      let download = HTTP(URLRequest(urlString: remoteZipUrl)!)
-      
-      download.run() { resp in
-        Console.log("Finished caching Remote UI")
-        if resp.error == nil {
-          do {
-            try resp.data.write(to: remoteZipPath, options: .atomic)
-          } catch {
-            print(error)
-          }
-        }
-      }
 
-    }
+  /// Calls back once, on the main queue, with whether the dev server answered within a second.
+  private static func devServerIsReachable (_ url: URL, _ completion: @escaping (Bool) -> Void) {
+    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 1)
+    URLSession.shared.dataTask(with: request) { _, response, error in
+      let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+      let reachable = error == nil && (200..<400).contains(statusCode)
+      DispatchQueue.main.async { completion(reachable) }
+    }.resume()
   }
 
   deinit {

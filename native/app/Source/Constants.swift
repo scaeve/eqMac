@@ -14,14 +14,16 @@ import Shared
 struct Constants {
   
   #if DEBUG
-//  static let UI_ENDPOINT_URL = URL(string: "http://www.eqmac.local:8080")!
-//  static let UI_ENDPOINT_URL = URL(string: "https://ui-v3.eqmac.app")!
-  static let UI_ENDPOINT_URL = URL(string: "http://localhost:8080")!
+  // Debug builds load the UI from a running `npm start` (ng serve) dev server when
+  // one is up, so UI changes show without rebuilding the app. Otherwise the UI bundled
+  // in the app is used. Release builds only ever use the bundled UI: upstream loaded it
+  // from the original developer's server, which would hide this fork's UI changes.
+  static let UI_DEV_SERVER_URL: URL? = URL(string: "http://localhost:8080")!
 
   static let DEBUG = true
   #else
   static let DEBUG = false
-  static let UI_ENDPOINT_URL = URL(string: "https://ui-v3.eqmac.app")!
+  static let UI_DEV_SERVER_URL: URL? = nil
   #endif
   
   static let DOMAIN = "eqmac.app"
