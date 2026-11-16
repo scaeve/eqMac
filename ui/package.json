@@ -3,8 +3,8 @@
   "version": "3.1.0",
   "scripts": {
     "lint": "npx eslint .",
-    "start": "../node_modules/.bin/ng serve --port 8080 --host 0.0.0.0 --disable-host-check",
-    "build": "rm -rf dist/ && ../node_modules/.bin/ng build --configuration production && node -e \"console.log(require('./package.json').version)\" > dist/version.txt && rm -rf ../native/app/Embedded && mkdir -p ../native/app/Embedded && cp -R dist ../native/app/Embedded/ui"
+    "start": "node scripts/ng.js serve --port 8080 --host 0.0.0.0 --disable-host-check",
+    "build": "rm -rf dist/ && node scripts/ng.js build --configuration production && node -e \"console.log(require('./package.json').version)\" > dist/version.txt && rm -rf ../native/app/Embedded && mkdir -p ../native/app/Embedded && cp -R dist ../native/app/Embedded/ui"
   },
   "private": true,
   "dependencies": {

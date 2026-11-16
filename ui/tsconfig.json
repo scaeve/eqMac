@@ -11,6 +11,7 @@
     "downlevelIteration": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "target": "es5",
     "typeRoots": [
       "node_modules/@types",

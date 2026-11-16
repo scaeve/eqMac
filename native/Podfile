@@ -1,15 +1,19 @@
-source 'https://github.com/AudioKit/Specs.git'
-source 'https://github.com/CocoaPods/Specs.git'
+source 'https://cdn.cocoapods.org/'
 
-# Uncomment the next line to define a global platform for your project
-platform :osx, '10.12'
+# macOS 12 is the oldest deployment target supported by current Xcode SDKs.
+DEPLOYMENT_TARGET = '12.0'
+
+platform :osx, DEPLOYMENT_TARGET
 workspace 'eqMac.xcworkspace'
 use_frameworks!
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.12'
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = DEPLOYMENT_TARGET
+      # Pods are built from source as part of the app, so let them inherit
+      # the app's (ad-hoc) signing instead of requiring a team.
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
     end
   end
 end
@@ -17,30 +21,24 @@ end
 # ignore all warnings from all pods
 inhibit_all_warnings!
 
-def shared_pods
-  pod 'STPrivilegedTask', :git => 'https://github.com/sveinbjornt/STPrivilegedTask.git', :commit => 'fdca677c77adb166a2be4c5ea9c7580a738c49c9'
-end
-
 project 'app/eqMac.xcodeproj'
 
+# Removed from upstream for this fork:
+#  - Sparkle: its feed points at the official eqMac update server and would
+#    replace this fork with the official build.
+#  - Sentry: would send crash reports to the original developer.
+#  - SwiftHTTP, Zip: only used to download and unpack the remotely hosted UI.
+#  - SwiftLint: not used by any build phase.
 target 'eqMac' do
   project 'app/eqMac.xcodeproj'
 
-  pod 'SwiftHTTP', '~> 3.0'
-  pod 'AMCoreAudio', :git => 'https://github.com/bitgapp/AMCoreAudio.git', :commit => 'b312d1509ef863dea3ca56cfa3f57451de4ff721'
+  # The bitgapp/AMCoreAudio fork this depends on was deleted from GitHub; it is vendored here.
+  pod 'AMCoreAudio', :path => 'vendor/AMCoreAudio'
   pod 'WebViewJavascriptBridge', '~> 6.0'
-#  pod 'ReachabilitySwift'
   pod 'ReSwift', '~> 6.1'
-  pod 'SwiftLint'
-  pod 'Sparkle', '~> 1.24'
-  pod 'Sentry', '~> 7.1.3'
   pod 'EmitterKit', '~> 5.2.2'
   pod 'SwiftyJSON', '~> 4.2'
   pod 'SwiftyUserDefaults', '4.0'
   pod 'KeychainSwift', '~> 13.0'
-  pod 'Zip', :git => 'https://github.com/bitgapp/Zip.git'
-  shared_pods
-
+  pod 'STPrivilegedTask', :git => 'https://github.com/sveinbjornt/STPrivilegedTask.git', :commit => 'fdca677c77adb166a2be4c5ea9c7580a738c49c9'
 end
-
-
