@@ -558,7 +558,6 @@
 				E0F4FD9A22888AC300BEB0A6 /* Run Script - LaunchAtLogin copy-helper */,
 				896A6D438DAEE15F87C748E4 /* [CP] Embed Pods Frameworks */,
 				E0A48D6323C61CC200700C39 /* Run Script - Hardruntime + Sign LaunchAtLogin */,
-				E06B9AEA2459CAFE00A4D10B /* Run Script - Upload dSYM to Sentry */,
 			);
 			buildRules = (
 			);
@@ -710,25 +709,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
 			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\n    pkill -f \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" || true\nfi\n";
-		};
-		E06B9AEA2459CAFE00A4D10B /* Run Script - Upload dSYM to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-			);
-			name = "Run Script - Upload dSYM to Sentry";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ $CONFIGURATION != \"Release\" ]]; then\nexit 0\nfi\n\nif which sentry-cli >/dev/null; then\nsource ~/.zshrc\nexport SENTRY_ORG=bitgapp\nexport SENTRY_PROJECT=eqmac-swift\nERROR=$(sentry-cli upload-dif \"$DWARF_DSYM_FOLDER_PATH\" --log-level=debug 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nexit 1\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nexit 1\nfi\n";
 		};
 		E0A48D6323C61CC200700C39 /* Run Script - Hardruntime + Sign LaunchAtLogin */ = {
 			isa = PBXShellScriptBuildPhase;

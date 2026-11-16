@@ -24,7 +24,6 @@ struct Constants {
   static let UI_ENDPOINT_URL = URL(string: "https://ui-v3.eqmac.app")!
   #endif
   
-  static let SENTRY_ENDPOINT = "https://afd95e4c332b4b1da4bb23b9cc66782c@sentry.io/1243254"
   static let DOMAIN = "eqmac.app"
   static let WEBSITE_URL = URL(string: "https://\(Constants.DOMAIN)")!
   static let FAQ_URL = URL(string: "https://\(Constants.DOMAIN)/faq")!

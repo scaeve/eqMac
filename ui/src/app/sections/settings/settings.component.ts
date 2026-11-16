@@ -5,7 +5,6 @@ import { ApplicationService } from '../../services/app.service'
 import { MatDialog } from '@angular/material/dialog'
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component'
 import { StatusItemIconType, UIService } from '../../services/ui.service'
-import { AnalyticsService } from '../../services/analytics.service'
 import { SemanticVersion } from '../../services/semantic-version.service'
 import { OptionsDialogComponent } from '../../components/options-dialog/options-dialog.component'
 import { KnobControlStyle } from '../../../../../modules/components/src'
@@ -55,46 +54,6 @@ export class SettingsComponent implements OnInit {
     value: false,
     toggled: alwaysOnTop => {
       this.ui.setAlwaysOnTop({ alwaysOnTop })
-    }
-  }
-
-  doCollectTelemetryOption: CheckboxOption = {
-    type: 'checkbox',
-    label: 'Send Analytics telemetry',
-    tooltip: `
-eqMac would collect anonymous Telemetry analytics data like:
-
-• macOS Version
-• App and UI Version
-• Country (IP Addresses are anonymized)
-
-This helps us understand distribution of our users.
-`,
-    value: false,
-    toggled: doCollectTelemetry => {
-      this.ui.setSettings({ doCollectTelemetry })
-      if (doCollectTelemetry) {
-        this.analytics.init()
-      } else {
-        this.analytics.deinit()
-      }
-    }
-  }
-
-  doCollectCrashReportsOption: CheckboxOption = {
-    type: 'checkbox',
-    label: 'Send Crash reports',
-    tooltip: `
-eqMac would send anonymized crash reports
-back to the developer in case eqMac crashes.
-This helps us understand improve eqMac 
-and make it a more stable product.
-`,
-    value: false,
-    toggled: doCollectCrashReports => {
-      this.settingsService.setDoCollectCrashReports({
-        doCollectCrashReports
-      })
     }
   }
 
@@ -300,15 +259,6 @@ all without needing the user to do a full app update.
     ],
 
     [ this.divider ],
-
-    // Privacy
-    [ { type: 'label', label: 'Privacy' } ],
-    [
-      this.doCollectTelemetryOption,
-      this.doCollectCrashReportsOption
-    ],
-
-    [ this.divider ],
     // Misc
     [ this.uninstallOption ]
   ]
@@ -318,7 +268,6 @@ all without needing the user to do a full app update.
     public app: ApplicationService,
     public dialog: MatDialog,
     public ui: UIService,
-    public analytics: AnalyticsService,
     private readonly changeRef: ChangeDetectorRef
   ) {
   }
@@ -338,7 +287,6 @@ all without needing the user to do a full app update.
       launchOnStartup,
       iconMode,
       UISettings,
-      doCollectCrashReports,
       doOTAUpdates,
       alwaytOnTop,
       statusItemIconType,
@@ -347,7 +295,6 @@ all without needing the user to do a full app update.
       this.settingsService.getLaunchOnStartup(),
       this.settingsService.getIconMode(),
       this.ui.getSettings(),
-      this.settingsService.getDoCollectCrashReports(),
       this.settingsService.getDoOTAUpdates(),
       this.ui.getAlwaysOnTop(),
       this.ui.getStatusItemIconType(),
@@ -357,8 +304,6 @@ all without needing the user to do a full app update.
     this.launchOnStartupOption.value = launchOnStartup
     this.replaceKnobsWithSlidersOption.value = UISettings.replaceKnobsWithSliders
     this.knobControlStyleOption.selectedId = UISettings.knobControlStyle
-    this.doCollectTelemetryOption.value = UISettings.doCollectTelemetry
-    this.doCollectCrashReportsOption.value = doCollectCrashReports
     this.otaUpdatesOption.value = doOTAUpdates
     this.alwaysOnTopOption.value = alwaytOnTop
     this.statusItemIconTypeOption.selectedId = statusItemIconType
