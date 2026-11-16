@@ -10,6 +10,11 @@
   <a href="https://discord.eqmac.app"><img src="https://img.shields.io/badge/chat-discord-black?style=flat&logo=discord" alt="discord chat"></a>
 </p>
 
+> **This is a community fork** of the open-source eqMac v1.3.2. It builds on current macOS and
+> Xcode, installs next to the official eqMac without interfering with it, and contains no update
+> checks, analytics or crash reporting. See [BUILDING.md](BUILDING.md) to build and install it.
+> It is not affiliated with Bitgapp or the official eqMac app.
+
 **Notice: Currently the code in this repository corresponds to v1.3.2 of eqMac without any Pro Features and all the newer releases are done on a private fork. Having the Free parts of the app open sourced required too much time to maintain and split off.**
 
 ## Features
