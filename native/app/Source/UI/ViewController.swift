@@ -79,8 +79,9 @@ class ViewController: NSViewController, WKNavigationDelegate {
   }
   
   func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-    let cred = URLCredential(trust: challenge.protectionSpace.serverTrust!)
-    completionHandler(.useCredential, cred)
+    // Upstream trusted any server certificate here. The UI now only loads from the app
+    // bundle or a localhost dev server, so let WebKit validate certificates normally.
+    completionHandler(.performDefaultHandling, nil)
   }
   
 }
