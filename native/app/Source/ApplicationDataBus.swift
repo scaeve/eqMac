@@ -69,9 +69,10 @@ class ApplicationDataBus: DataBus {
     }
     
     self.on(.GET, "/uninstall") { _, res in
-      let url = URL(string: "#uninstall", relativeTo: Constants.FAQ_URL)!
-      NSWorkspace.shared.open(url)
-      return "FAQ Openned"
+      // Upstream's FAQ says to delete eqMac.driver, which is the official build's driver.
+      // This fork installs eqMacFork.driver, so point at the fork's own instructions.
+      NSWorkspace.shared.open(Constants.UNINSTALL_DOCS_URL)
+      return "Uninstall instructions opened"
     }
     
     self.on(.GET, "/driver/reinstall/available") { _, res in

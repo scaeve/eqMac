@@ -30,8 +30,10 @@ struct Constants {
   static let WEBSITE_URL = URL(string: "https://\(Constants.DOMAIN)")!
   static let FAQ_URL = URL(string: "https://\(Constants.DOMAIN)/faq")!
   static let FORK_REPO_URL = URL(string: "https://github.com/scaeve/eqMac")!
-  static let BUG_REPORT_URL = URL(string: "https://\(Constants.DOMAIN)/bug-report")!
+  static let BUG_REPORT_URL = FORK_REPO_URL.appendingPathComponent("issues")
   static let RELEASES_URL = FORK_REPO_URL.appendingPathComponent("releases")
+  static let DRIVER_INSTALL_DOCS_URL = URL(string: "https://github.com/scaeve/eqMac/blob/master/BUILDING.md#install-the-audio-driver")!
+  static let UNINSTALL_DOCS_URL = URL(string: "https://github.com/scaeve/eqMac/blob/master/BUILDING.md#uninstall")!
   static let DRIVER_DEVICE_UID = Shared.DRIVER_DEVICE_UID
   static let DRIVER_MINIMUM_VERSION = Version(tolerant: "1.3")!
   static let LEGACY_DRIVER_UIDS = ["EQMAC2.1_DRIVER_ENGINE", "EQMAC2_DRIVER_ENGINE"]
@@ -53,7 +55,7 @@ struct Constants {
   static let TRUSTED_URL_PREFIXES: [String] = [
     "https://eqmac.app",
     "https://github.com/bitgapp/",
-    "https://github.com/bitgapp/",
+    "https://github.com/scaeve/",
     "https://github.com/jaakkopasanen/AutoEq"
   ]
 }
