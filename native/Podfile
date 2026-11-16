@@ -5,7 +5,11 @@ DEPLOYMENT_TARGET = '12.0'
 
 platform :osx, DEPLOYMENT_TARGET
 workspace 'eqMac.xcworkspace'
-use_frameworks!
+# Static linkage: pods are linked into the app binary instead of being embedded as
+# separate dynamic frameworks. With the hardened runtime, dyld only loads dynamic
+# libraries signed by the app's own Team ID, and ad-hoc-signed local builds have no
+# Team ID, so embedded dynamic frameworks are refused at launch.
+use_frameworks! :linkage => :static
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
