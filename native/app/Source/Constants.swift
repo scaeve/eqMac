@@ -28,7 +28,9 @@ struct Constants {
   static let DOMAIN = "eqmac.app"
   static let WEBSITE_URL = URL(string: "https://\(Constants.DOMAIN)")!
   static let FAQ_URL = URL(string: "https://\(Constants.DOMAIN)/faq")!
+  static let FORK_REPO_URL = URL(string: "https://github.com/scaeve/eqMac")!
   static let BUG_REPORT_URL = URL(string: "https://\(Constants.DOMAIN)/bug-report")!
+  static let RELEASES_URL = FORK_REPO_URL.appendingPathComponent("releases")
   static let DRIVER_DEVICE_UID = Shared.DRIVER_DEVICE_UID
   static let DRIVER_MINIMUM_VERSION = Version(tolerant: "1.3")!
   static let LEGACY_DRIVER_UIDS = ["EQMAC2.1_DRIVER_ENGINE", "EQMAC2_DRIVER_ENGINE"]
@@ -46,8 +48,6 @@ struct Constants {
   static let TRANSITION_FRAME_DURATION: Double = 1000 / TRANSITION_FPS
   static let TRANSITION_FRAME_COUNT = UInt(round(TRANSITION_FPS * (Double(TRANSITION_DURATION) / 1000)))
   static let OPEN_SOURCE = true
-  static let UPDATES_FEED = URL(string: "https://update.eqmac.app/update.xml")!
-  static let BETA_UPDATES_FEED = URL(string: "https://update.eqmac.app/beta-update.xml")!
   static let OPEN_URL_TRUSTED_DOMAINS: [String] = ["eqmac.app", "github.com"]
   static let TRUSTED_URL_PREFIXES: [String] = [
     "https://eqmac.app",

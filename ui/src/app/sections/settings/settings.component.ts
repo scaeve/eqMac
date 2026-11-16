@@ -133,19 +133,8 @@ and make it a more stable product.
 
   updateOption: ButtonOption = {
     type: 'button',
-    label: 'Check for Updates',
+    label: 'Releases on GitHub',
     action: this.update.bind(this)
-  }
-
-  autoCheckUpdatesOption: CheckboxOption = {
-    type: 'checkbox',
-    value: false,
-    label: 'Auto Check',
-    toggled: doAutoCheckUpdates => {
-      this.settingsService.setDoAutoCheckUpdates({
-        doAutoCheckUpdates
-      })
-    }
   }
 
   otaUpdatesOption: CheckboxOption = {
@@ -162,22 +151,6 @@ all without needing the user to do a full app update.
     toggled: doOTAUpdates => {
       this.settingsService.setDoOTAUpdates({
         doOTAUpdates
-      })
-    }
-  }
-
-  betaUpdatesOption: CheckboxOption = {
-    type: 'checkbox',
-    value: false,
-    label: 'Beta Program',
-    tooltip: `
-Get and test the most latest changes to eqMac.
-Help the developer identify and fix uncaught issues, 
-before they go out to all users.
-`,
-    toggled: doBetaUpdates => {
-      this.settingsService.setDoBetaUpdates({
-        doBetaUpdates
       })
     }
   }
@@ -320,8 +293,6 @@ before they go out to all users.
 
     [ { type: 'label', label: 'Updates' } ],
     [
-      this.betaUpdatesOption,
-      this.autoCheckUpdatesOption,
       this.otaUpdatesOption
     ],
     [
@@ -368,22 +339,18 @@ before they go out to all users.
       iconMode,
       UISettings,
       doCollectCrashReports,
-      doAutoCheckUpdates,
       doOTAUpdates,
       alwaytOnTop,
       statusItemIconType,
-      doBetaUpdates,
       uiScale
     ] = await Promise.all([
       this.settingsService.getLaunchOnStartup(),
       this.settingsService.getIconMode(),
       this.ui.getSettings(),
       this.settingsService.getDoCollectCrashReports(),
-      this.settingsService.getDoAutoCheckUpdates(),
       this.settingsService.getDoOTAUpdates(),
       this.ui.getAlwaysOnTop(),
       this.ui.getStatusItemIconType(),
-      this.settingsService.getDoBetaUpdates(),
       this.ui.getScale()
     ])
     this.iconModeOption.selectedId = iconMode
@@ -392,11 +359,9 @@ before they go out to all users.
     this.knobControlStyleOption.selectedId = UISettings.knobControlStyle
     this.doCollectTelemetryOption.value = UISettings.doCollectTelemetry
     this.doCollectCrashReportsOption.value = doCollectCrashReports
-    this.autoCheckUpdatesOption.value = doAutoCheckUpdates
     this.otaUpdatesOption.value = doOTAUpdates
     this.alwaysOnTopOption.value = alwaytOnTop
     this.statusItemIconTypeOption.selectedId = statusItemIconType
-    this.betaUpdatesOption.value = doBetaUpdates
     this.uiScaleSlider.value = uiScale
     this.setUIScaleScreenValue()
   }

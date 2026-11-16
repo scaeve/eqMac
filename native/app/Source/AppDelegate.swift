@@ -9,48 +9,22 @@
 import Cocoa
 import SwiftyJSON
 import ServiceManagement
-import Sparkle
 import EmitterKit
 import AMCoreAudio
 import Shared
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
 
-  var updateProcessed = EmitterKit.Event<Void>()
-  var willBeDownloadingUpdate = false
-  
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     for window in NSApplication.shared.windows {
       window.close()
     }
 
-    Application.updater.delegate = self
-    Application.updater.feedURL = Settings.updatesFeedUrl
-    
-    updateProcessed.once { _ in
-      Application.start()
-    }
-
-    if (Application.store.state.settings.doAutoCheckUpdates) {
-      var stillCheckingConnection = true
-      Networking.checkConnected { connected in
-        stillCheckingConnection = false
-        if (connected) {
-          Application.updater.checkForUpdatesInBackground()
-        } else {
-          self.updateProcessed.emit()
-        }
-      }
-
-      Async.delay(2000) {
-        if (stillCheckingConnection) {
-          self.updateProcessed.emit()
-        }
-      }
-    } else {
-      self.updateProcessed.emit()
-    }
+    // Upstream gated startup on a Sparkle update check against the official eqMac
+    // feed, which would offer to replace this fork with the official build.
+    // This fork has no update feed, so start right away.
+    Application.start()
 
     NSWorkspace.shared.notificationCenter.addObserver(
         self, selector: #selector(didWakeUp(event:)),
@@ -86,42 +60,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, SUUpdaterDelegate {
     }
   }
   
-  func updaterDidNotFindUpdate(_ updater: SUUpdater) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, userDidSkipThisVersion item: SUAppcastItem) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, didCancelInstallUpdateOnQuit item: SUAppcastItem) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, willDownloadUpdate item: SUAppcastItem, with request: NSMutableURLRequest) {
-    willBeDownloadingUpdate = true
-  }
-  
-  func updater(_ updater: SUUpdater, didDismissUpdateAlertPermanently permanently: Bool, for item: SUAppcastItem) {
-    Async.delay(500, completion: {
-      if !self.willBeDownloadingUpdate {
-        self.updateProcessed.emit()
-      }
-    })
-  }
-  
-  func userDidCancelDownload(_ updater: SUUpdater) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, didAbortWithError error: Error) {
-    updateProcessed.emit()
-  }
-  
-  func updater(_ updater: SUUpdater, failedToDownloadUpdate item: SUAppcastItem, error: Error) {
-    updateProcessed.emit()
-  }
-
   @objc func willSleep(event: NSNotification) {
     Application.handleSleep()
   }

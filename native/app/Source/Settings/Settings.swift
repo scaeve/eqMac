@@ -51,28 +51,10 @@ class Settings: StoreSubscriber {
     }
   }
 
-  static var doAutoCheckUpdates = Application.store.state.settings.doAutoCheckUpdates {
-    didSet {
-      Application.updater.automaticallyChecksForUpdates = doAutoCheckUpdates
-    }
-  }
-
-  static var doBetaUpdates = Application.store.state.settings.doBetaUpdates {
-    didSet {
-      Application.updater.feedURL = updatesFeedUrl
-    }
-  }
-
-  static var updatesFeedUrl: URL! {
-    return Application.store.state.settings.doBetaUpdates ? Constants.BETA_UPDATES_FEED : Constants.UPDATES_FEED
-  }
-
   init() {
     self.setupStateListener()
     ({
       Settings.iconMode = Application.store.state.settings.iconMode
-      Settings.doAutoCheckUpdates = Application.store.state.settings.doAutoCheckUpdates
-      Settings.doBetaUpdates = Application.store.state.settings.doBetaUpdates
     })()
   }
 
@@ -86,12 +68,6 @@ class Settings: StoreSubscriber {
   func newState(state: SettingsState) {
     if (state.iconMode != Settings.iconMode) {
       Settings.iconMode = state.iconMode
-    }
-    if (state.doAutoCheckUpdates != Settings.doAutoCheckUpdates) {
-      Settings.doAutoCheckUpdates = state.doAutoCheckUpdates
-    }
-    if (state.doBetaUpdates != Settings.doBetaUpdates) {
-      Settings.doBetaUpdates = state.doBetaUpdates
     }
   }
 

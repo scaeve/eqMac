@@ -17,7 +17,6 @@ import SwiftyUserDefaults
 import SwiftyJSON
 import ServiceManagement
 import ReSwift
-import Sparkle
 import Shared
 
 enum VolumeChangeDirection: String {
@@ -55,8 +54,6 @@ class Application {
 
   static var dataBus: ApplicationDataBus!
   static let error = EmitterKit.Event<String>()
-  
-  static var updater = SUUpdater(for: Bundle.main)!
   
   static let store: Store = Store(
     reducer: ApplicationStateReducer,
@@ -619,7 +616,8 @@ class Application {
   }
   
   static func checkForUpdates () {
-    updater.checkForUpdates(nil)
+    // No update feed for this fork (upstream's Sparkle feed served the official build).
+    NSWorkspace.shared.open(Constants.RELEASES_URL)
   }
   
   static func uninstall () {
