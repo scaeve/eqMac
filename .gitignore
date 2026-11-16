@@ -7,6 +7,14 @@ node_modules
 dist
 !modules/**/dist
 **/package-lock.json
+# Commit the root lockfile so dependency versions don't drift between builds.
+!/package-lock.json
 **/yarn.lock
 
 native/app/Sandbox.playground/Resources/track.mp3
+
+# Built UI, copied in by `npm run build` in ui/
+native/app/Embedded/
+
+# Created when an editor resolves the Shared Swift package by itself
+native/shared/Package.resolved

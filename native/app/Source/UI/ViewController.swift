@@ -50,11 +50,16 @@ class ViewController: NSViewController, WKNavigationDelegate {
   }
 
   func load (_ url: URL) {
-    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
     if self.webView.isLoading {
       self.webView.stopLoading()
     }
-    self.webView.load(request)
+    if url.isFileURL {
+      // The bundled UI lives next to its index.html; WebKit only lets a file:// page
+      // read sibling scripts and styles when access is granted explicitly.
+      self.webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+    } else {
+      self.webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData))
+    }
 
     
     Async.delay(1000) {
@@ -74,8 +79,9 @@ class ViewController: NSViewController, WKNavigationDelegate {
   }
   
   func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-    let cred = URLCredential(trust: challenge.protectionSpace.serverTrust!)
-    completionHandler(.useCredential, cred)
+    // Upstream trusted any server certificate here. The UI now only loads from the app
+    // bundle or a localhost dev server, so let WebKit validate certificates normally.
+    completionHandler(.performDefaultHandling, nil)
   }
   
 }

@@ -1,8 +1,13 @@
 import Foundation
 import CoreAudio.AudioServerPlugIn
 
-public let APP_BUNDLE_ID = "com.bitgapp.eqmac"
-public let DRIVER_BUNDLE_ID = "com.bitgapp.eqmac.driver"
+// Fork identity. These must differ from the official eqMac build (com.bitgapp.eqmac)
+// so this fork's app, driver and settings can be installed side by side with it
+// without either one picking up the other's audio device or preferences.
+public let APP_BUNDLE_ID = "com.scaeve.eqmac"
+public let DRIVER_BUNDLE_ID = "com.scaeve.eqmac.driver"
+public let DRIVER_DEVICE_UID = "com.scaeve.eqmac.device"
+public let DRIVER_DEVICE_MODEL_UID = "com.scaeve.eqmac.device.model"
 
 public struct EQMDeviceCustomProperties: Loopable {
   public let version = AudioObjectPropertySelector.fromString("vrsn")

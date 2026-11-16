@@ -10,14 +10,12 @@ import Foundation
 import Cocoa
 import AMCoreAudio
 import Dispatch
-import Sentry
 import EmitterKit
 import AVFoundation
 import SwiftyUserDefaults
 import SwiftyJSON
 import ServiceManagement
 import ReSwift
-import Sparkle
 import Shared
 
 enum VolumeChangeDirection: String {
@@ -56,8 +54,6 @@ class Application {
   static var dataBus: ApplicationDataBus!
   static let error = EmitterKit.Event<String>()
   
-  static var updater = SUUpdater(for: Bundle.main)!
-  
   static let store: Store = Store(
     reducer: ApplicationStateReducer,
     state: ApplicationState.load(),
@@ -77,13 +73,7 @@ class Application {
   static var equalizersTypeChangedListener: EventListener<EqualizerType>?
 
   static public func start () {
-    if (!Constants.DEBUG) {
-      setupCrashReporting()
-    }
-    
     self.settings = Settings()
-
-    Networking.startMonitor()
     
     Driver.check {
       Sources.getInputPermission {
@@ -126,20 +116,6 @@ class Application {
     }
   }
   
-  private static func setupCrashReporting () {
-    // Create a Sentry client and start crash handler
-    SentrySDK.start { options in
-      options.dsn = Constants.SENTRY_ENDPOINT
-      // Only send crash reports if user gave consent
-      options.beforeSend = { event in
-        if (store.state.settings.doCollectCrashReports) {
-          return event
-        }
-        return nil
-      }
-    }
-  }
-
   private static var settingUpAudio = false
   private static func setupAudio () {
     if (settingUpAudio) { return }
@@ -470,6 +446,15 @@ class Application {
   }
   
   private static func switchBackToLastKnownDevice () {
+    // Only restore an output device if system audio is currently routed through eqMac's
+    // driver; otherwise there is nothing to undo. Without this guard, quitting while the
+    // driver isn't installed (e.g. from the "driver not installed" alert) crashed on a nil
+    // Driver.device below, and could otherwise switch the system to the built-in speakers.
+    guard let driverDevice = Driver.device,
+          AudioDevice.defaultOutputDevice()?.id == driverDevice.id else {
+      return
+    }
+
     // If the active equalizer global gain hass been lowered we need to equalize the volume to avoid blowing people ears out
     let device = getLastKnowDeviceFromStack()
 
@@ -619,7 +604,8 @@ class Application {
   }
   
   static func checkForUpdates () {
-    updater.checkForUpdates(nil)
+    // No update feed for this fork (upstream's Sparkle feed served the official build).
+    NSWorkspace.shared.open(Constants.RELEASES_URL)
   }
   
   static func uninstall () {

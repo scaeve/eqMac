@@ -16,23 +16,20 @@ import Shared
 class Driver {
   static func check (_ completion: @escaping() -> Void) {
     if !Driver.isInstalled || !Driver.isCompatible {
-      let isIncompatable = Driver.isInstalled && !Driver.isCompatible
-      let message = isIncompatable ?
-        "For unknown reason the version of Audio Driver needed for eqMac to work currently is not compatable. Try restarting your computer and run eqMac again. In that doesn't work, try re-installing eqMac from our website."
-        : "For unknown reason the Audio Driver needed for eqMac to work currently is not installed. Try restarting your computer and run eqMac again. In that doesn't work, try re-installing eqMac from our website."
-      let title = isIncompatable ? "The eqMac Audio Driver is Incompatable" : "The eqMac Audio Driver is not installed"
+      // This build uses its own driver (eqMacFork.driver), separate from the official
+      // eqMac driver, so the official installer can't fix this; point at the fork's docs.
+      let isIncompatible = Driver.isInstalled && !Driver.isCompatible
+      let message = isIncompatible ?
+        "The installed eqMacFork audio driver (\(installedVersion)) doesn't match this build of eqMac. Rebuild and reinstall it with native/scripts/install-driver.sh, then start eqMac again."
+        : "This build of eqMac needs its own audio driver (eqMacFork.driver), which isn't installed or isn't loaded yet. Install it with native/scripts/install-driver.sh, then start eqMac again."
+      let title = isIncompatible ? "The eqMac audio driver is incompatible" : "The eqMac audio driver is not installed"
       Alert.withButtons(
         title: title,
         message: message,
-        buttons: ["Restart Mac", "Re-install eqMac", "Quit"]
+        buttons: ["Open Install Instructions", "Quit"]
       ) { buttonPressed in
-        switch NSApplication.ModalResponse(buttonPressed) {
-          case .alertFirstButtonReturn:
-            Application.restartMac()
-            break
-          case .alertSecondButtonReturn:
-            NSWorkspace.shared.open(Constants.WEBSITE_URL)
-          default: break
+        if NSApplication.ModalResponse(buttonPressed) == .alertFirstButtonReturn {
+          NSWorkspace.shared.open(Constants.DRIVER_INSTALL_DOCS_URL)
         }
         return Application.quit()
       }
