@@ -710,7 +710,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\n    pkill -f eqMac.app || true\nfi\n";
+			shellScript = "if [[ $CONFIGURATION == \"Debug\" ]]; then\n    pkill -f \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\" || true\nfi\n";
 		};
 		E06B9AEA2459CAFE00A4D10B /* Run Script - Upload dSYM to Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
