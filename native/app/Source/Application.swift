@@ -446,6 +446,15 @@ class Application {
   }
   
   private static func switchBackToLastKnownDevice () {
+    // Only restore an output device if system audio is currently routed through eqMac's
+    // driver; otherwise there is nothing to undo. Without this guard, quitting while the
+    // driver isn't installed (e.g. from the "driver not installed" alert) crashed on a nil
+    // Driver.device below, and could otherwise switch the system to the built-in speakers.
+    guard let driverDevice = Driver.device,
+          AudioDevice.defaultOutputDevice()?.id == driverDevice.id else {
+      return
+    }
+
     // If the active equalizer global gain hass been lowered we need to equalize the volume to avoid blowing people ears out
     let device = getLastKnowDeviceFromStack()
 
